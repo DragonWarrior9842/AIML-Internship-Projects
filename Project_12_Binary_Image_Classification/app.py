@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 import streamlit as st
 from PIL import Image
@@ -9,7 +8,10 @@ from tensorflow.keras.models import load_model
 # Config — must match what the model was trained on
 # ---------------------------------------------------------
 IMG_WIDTH, IMG_HEIGHT = 150, 150
-MODEL_PATH = "binary_image_classifier.h5"
+
+# Dynamically get the folder where app.py lives, then attach the model filename
+current_dir = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(current_dir, "binary_image_classifier.h5")
 
 st.set_page_config(
     page_title="Cat vs Dog Classifier",
