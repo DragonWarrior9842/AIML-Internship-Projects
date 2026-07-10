@@ -6,5 +6,4 @@ langchain-text-splitters==0.3.9
 langchain-chroma==0.2.5
 unstructured[html]==0.18.11
 pydantic==2.11.9
-chromadb==0.5.23
- 
+chromadb>=1.0.9
