@@ -170,3 +170,51 @@ st.caption(
     "Built with Streamlit - Percentile-based outlier removal on the "
     "AB_NYC_2019 (New York City Airbnb Open Data) dataset."
 )
+
+# --------------------------------------------------------------------------
+# Developer credit - slim footer bar pinned to the bottom of the page
+# --------------------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+    .dev-footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #0e1117;
+        border-top: 1px solid #262730;
+        padding: 8px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #b0b0b0;
+        z-index: 999;
+    }
+    .dev-footer a {
+        color: #b0b0b0;
+        text-decoration: none;
+        margin-left: 14px;
+    }
+    .dev-footer a:hover {
+        color: #4C7DF5;
+    }
+    /* keep footer from covering the last bit of content */
+    .block-container {
+        padding-bottom: 4rem;
+    }
+    </style>
+
+    <div class="dev-footer">
+        <div>Built by <strong>Aditya Agarwal</strong> &middot; Data Science / ML Enthusiast</div>
+        <div>
+            <a href="mailto:aasblko@gmail.com">Email</a>
+            <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">LinkedIn</a>
+            <a href="https://github.com/DragonWarrior9842" target="_blank">GitHub</a>
+            <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">Instagram</a>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
