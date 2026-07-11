@@ -59,7 +59,7 @@ sl.markdown(
 
 col_logo, col_title = sl.columns([1, 5])
 with col_logo:
-    sl.image("insurance.jpg", width=400)
+    sl.image(os.path.join(BASE_DIR, "insurance.jpg"), width=400)
 with col_title:
     sl.title("Insurance Prediction")
     sl.caption("A simple ML demo that predicts insurance need based on age.")
