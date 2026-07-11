@@ -2,7 +2,10 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import joblib
+import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model = joblib.load(os.path.join(BASE_DIR, "male_and_female.pkl"))
 # -------------------------
 # Page Configuration
 # -------------------------
@@ -14,8 +17,7 @@ st.set_page_config(
 
 # -------------------------
 # Load Model
-# -------------------------
-model = joblib.load("male_and_female.pkl")
+
 
 IMG_SIZE = 64
 
