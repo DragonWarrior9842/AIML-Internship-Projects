@@ -6,44 +6,24 @@ import os
 sl.set_page_config(page_title="House Price Prediction using Linear Regression", layout='centered')
 
 # --------------------------------------------------------------------------
-# Developer credit - small floating badge, top-right corner
+# Developer credit - sidebar
 # --------------------------------------------------------------------------
-sl.markdown(
-    """
-    <style>
-    .dev-badge {
-        position: fixed;
-        top: 12px;
-        right: 16px;
-        background-color: #1a1c24;
-        border: 1px solid #333844;
-        border-radius: 999px;
-        padding: 6px 14px;
-        font-size: 0.78rem;
-        color: #cfcfcf;
-        z-index: 999;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-    .dev-badge a {
-        color: #cfcfcf;
-        text-decoration: none;
-        margin-left: 8px;
-    }
-    .dev-badge a:hover {
-        color: #4C7DF5;
-    }
-    </style>
+with sl.sidebar:
+    sl.header("About the Developer")
+    sl.write("**Aditya Agarwal**")
+    sl.write("Data Science / ML Enthusiast")
+    sl.write(
+        "Currently a student of Shri Ramswaroop Memorial College of "
+        "Engineering and Management, Lucknow, pursuing a Bachelor of "
+        "Technology in Computer Science Engineering."
+    )
 
-    <div class="dev-badge">
-        👨‍💻 Aditya Agarwal
-        <a href="mailto:aasblko@gmail.com" title="Email">📧</a>
-        <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank" title="LinkedIn">💼</a>
-        <a href="https://github.com/DragonWarrior9842" target="_blank" title="GitHub">🐙</a>
-        <a href="https://www.instagram.com/adityaagarwal67/" target="_blank" title="Instagram">🌐</a>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+    sl.markdown("---")
+
+    sl.markdown("📧 [Email](mailto:aasblko@gmail.com)")
+    sl.markdown("💼 [LinkedIn](https://www.linkedin.com/in/aditya-agarwal-48348126b/)")
+    sl.markdown("🐙 [GitHub](https://github.com/DragonWarrior9842)")
+    sl.markdown("🌐 [Instagram](https://www.instagram.com/adityaagarwal67/)")
 
 sl.title("House Price Prediction using Linear Regression")
 
