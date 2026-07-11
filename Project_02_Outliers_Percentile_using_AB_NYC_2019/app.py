@@ -24,7 +24,7 @@ st.caption(
 # Data loading
 # --------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_PATH = os.path.join(BASE_DIR, "AB_NYC_2019.csv")v
+DEFAULT_PATH = os.path.join(BASE_DIR, "AB_NYC_2019.csv")
 
 @st.cache_data
 def load_data(file) -> pd.DataFrame:
