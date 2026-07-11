@@ -128,17 +128,19 @@ st.markdown(
 
     <div id="dev-card">
         <div id="dev-panel">
-            <h4>🚀 Your Name Here</h4>
-            <div class="role">&lt;/&gt; Data Scientist &amp; ML Enthusiast</div>
+            <h4>🚀 Aditya Agarwal</h4>
+            <div class="role">&lt;/&gt; Data Science &amp; ML Enthusiast</div>
             <p class="bio">
-                ✨ Built this K-Means tutorial to make clustering intuitive —
-                from raw scatter plots to elbow curves. Always tinkering with
-                data, models, and weird edge cases. 🧠📈
+                ✨ B.Tech CSE student at Shri Ramswaroop Memorial College of
+                Engineering &amp; Management, Lucknow. Built this K-Means tutorial
+                to make clustering intuitive — from raw scatter plots to elbow
+                curves. 🧠📈
             </p>
             <div class="links">
-                <a href="https://github.com/yourhandle" target="_blank">🐙 GitHub</a>
-                <a href="https://linkedin.com/in/yourhandle" target="_blank">💼 LinkedIn</a>
-                <a href="mailto:you@example.com">✉️ Email</a>
+                <a href="https://github.com/DragonWarrior9842" target="_blank">🐙 GitHub</a>
+                <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">💼 LinkedIn</a>
+                <a href="mailto:aasblko@gmail.com">✉️ Email</a>
+                <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">🌐 Instagram</a>
             </div>
             <div class="signature">crafted with ☕ + Streamlit</div>
         </div>
