@@ -15,7 +15,33 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title(":chart_with_upwards_trend: Canada Per Capita Income Predictor")
+# --------------------------------------------------------------------------
+# Developer credit - popup dialog, opened from a button in the top corner
+# --------------------------------------------------------------------------
+@st.dialog("About the Developer")
+def show_developer_info():
+    st.markdown("### Aditya Agarwal")
+    st.write("Data Science / ML Enthusiast")
+    st.write(
+        "Currently a student of Shri Ramswaroop Memorial College of "
+        "Engineering and Management, Lucknow, pursuing a Bachelor of "
+        "Technology in Computer Science Engineering."
+    )
+    st.markdown("---")
+    st.markdown("📧 [Email](mailto:aasblko@gmail.com)")
+    st.markdown("💼 [LinkedIn](https://www.linkedin.com/in/aditya-agarwal-48348126b/)")
+    st.markdown("🐙 [GitHub](https://github.com/DragonWarrior9842)")
+    st.markdown("🌐 [Instagram](https://www.instagram.com/adityaagarwal67/)")
+
+
+title_col, button_col = st.columns([6, 1])
+with title_col:
+    st.title(":chart_with_upwards_trend: Canada Per Capita Income Predictor")
+with button_col:
+    st.write("")
+    if st.button("👤 Developer"):
+        show_developer_info()
+
 st.caption(
     "A simple linear regression model trained on historical per-capita "
     "income data, used to predict future values (e.g. year 2020)."
