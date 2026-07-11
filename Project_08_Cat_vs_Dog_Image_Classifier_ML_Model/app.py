@@ -15,6 +15,7 @@ st.set_page_config(
 # -------------------------
 # Load Model
 # -------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model = joblib.load(os.path.join(BASE_DIR, "cat_dog_model.pkl"))
 
 IMG_SIZE = 64
