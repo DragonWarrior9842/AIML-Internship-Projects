@@ -15,7 +15,7 @@ import streamlit as sl
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-df = pd.read_csv(os.path.join(BASE_DIR, "houseprice.csv"))
+df = pd.read_csv(os.path.join(BASE_DIR, "insurance.csv"))
 
 sl.set_page_config(page_title="Insurance Prediction", page_icon="insurance.jpg", layout="wide")
 
