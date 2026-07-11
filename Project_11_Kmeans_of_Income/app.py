@@ -15,6 +15,167 @@ def load_income_data():
 
 st.set_page_config(page_title="K-Means Clustering Tutorial", layout="wide")
 
+# =================================================================
+# 👨‍💻 ABOUT THE DEVELOPER — Bottom Slide-Up Drawer
+# =================================================================
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+    #dev-drawer-wrap {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    #dev-drawer-wrap details {
+        pointer-events: auto;
+        width: min(560px, 92vw);
+    }
+
+    #dev-drawer-wrap summary {
+        list-style: none;
+        cursor: pointer;
+        text-align: center;
+        background: #1b1b2b;
+        color: #f2e9dc;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.4px;
+        padding: 9px 20px;
+        border-radius: 14px 14px 0 0;
+        border: 1px solid #3a3a55;
+        border-bottom: none;
+        box-shadow: 0 -4px 18px rgba(0,0,0,0.35);
+        transition: background 0.2s ease;
+    }
+
+    #dev-drawer-wrap summary::-webkit-details-marker { display: none; }
+
+    #dev-drawer-wrap summary:hover {
+        background: #262640;
+    }
+
+    #dev-drawer-wrap summary::before {
+        content: "▲ ";
+        font-size: 11px;
+        color: #d4a94c;
+    }
+
+    #dev-drawer-panel {
+        background: #14141f;
+        border: 1px solid #3a3a55;
+        border-bottom: none;
+        border-radius: 14px 14px 0 0;
+        padding: 20px 26px 16px 26px;
+        margin-top: -1px;
+        box-shadow: 0 -8px 30px rgba(0,0,0,0.45);
+    }
+
+    #dev-drawer-panel .name-row {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 2px;
+    }
+
+    #dev-drawer-panel h3 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 20px;
+        margin: 0;
+    }
+
+    #dev-drawer-panel .role {
+        font-family: 'IBM Plex Mono', monospace;
+        color: #d4a94c;
+        font-size: 12px;
+    }
+
+    #dev-drawer-panel .edu {
+        font-family: 'IBM Plex Mono', monospace;
+        color: #a9a9c0;
+        font-size: 11.5px;
+        line-height: 1.6;
+        margin: 8px 0 12px 0;
+    }
+
+    #dev-drawer-panel .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    #dev-drawer-panel .chip-row span {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10.5px;
+        color: #f2e9dc;
+        background: #262640;
+        border: 1px solid #3a3a55;
+        padding: 4px 9px;
+        border-radius: 20px;
+    }
+
+    #dev-drawer-panel .link-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+    }
+
+    #dev-drawer-panel .link-row a {
+        color: #7fb4ff;
+        text-decoration: none;
+        border-bottom: 1px dotted #7fb4ff;
+    }
+
+    #dev-drawer-panel .link-row a:hover {
+        color: #d4a94c;
+        border-bottom-color: #d4a94c;
+    }
+    </style>
+
+    <div id="dev-drawer-wrap">
+        <details>
+            <summary>Meet the Developer</summary>
+            <div id="dev-drawer-panel">
+                <div class="name-row">
+                    <h3>Aditya Agarwal</h3>
+                    <span class="role">// data &amp; ml</span>
+                </div>
+                <div class="edu">
+                    🎓 B.Tech, Computer Science Engineering<br/>
+                    Shri Ramswaroop Memorial College of Engineering &amp; Management, Lucknow
+                </div>
+                <div class="chip-row">
+                    <span>🐍 Python</span>
+                    <span>📊 scikit-learn</span>
+                    <span>🎈 Streamlit</span>
+                    <span>📈 Clustering</span>
+                </div>
+                <div class="link-row">
+                    <a href="https://github.com/DragonWarrior9842" target="_blank">🐙 GitHub</a>
+                    <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">💼 LinkedIn</a>
+                    <a href="mailto:aasblko@gmail.com">✉️ Email</a>
+                    <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">🌐 Instagram</a>
+                </div>
+            </div>
+        </details>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.title("📊 K-Means Clustering — Interactive Tutorial")
 st.caption(
     "Based on the 'Introduction to K Means Clustering' tutorial: "
