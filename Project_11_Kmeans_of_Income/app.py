@@ -2,10 +2,16 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+import os
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.datasets import load_iris
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+@st.cache_data
+def load_income_data():
+    return pd.read_csv(os.path.join(BASE_DIR, "income.csv"))
 
 st.set_page_config(page_title="K-Means Clustering Tutorial", layout="wide")
 
@@ -47,11 +53,6 @@ def plot_clusters(ax, df, x_col, y_col, cluster_col, centers, title):
 # =================================================================
 with tab1:
     st.header("Customer Segmentation by Age & Income")
-
-
-    @st.cache_data
-    def load_income_data():
-        return pd.read_csv("income.csv")
 
 
     df_raw = load_income_data()

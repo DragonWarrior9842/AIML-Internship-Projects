@@ -1,9 +1,14 @@
 import pandas as pd
 import streamlit as sl
 from sklearn.linear_model import LinearRegression
+import os
+import pandas as pd
+
 sl.set_page_config(page_title="House Price Prediction using Linear Regression", layout='centered')
 sl.title("House Price Prediction using Linear Regression")
-df=pd.read_csv("houseprice.csv")
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+df = pd.read_csv(os.path.join(BASE_DIR, "houseprice.csv"))
 sl.subheader("Data of the Prices is given below")
 sl.dataframe(df)
 x=df.drop("price", axis=1)

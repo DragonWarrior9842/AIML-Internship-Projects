@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import plotly.express as px
+import os
+
 
 # --------------------------------------------------------------------------
 # Page config
@@ -21,8 +23,8 @@ st.caption(
 # --------------------------------------------------------------------------
 # Data loading
 # --------------------------------------------------------------------------
-DEFAULT_PATH = "AB_NYC_2019.csv"
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_PATH = os.path.join(BASE_DIR, "AB_NYC_2019.csv")
 
 @st.cache_data
 def load_data(file) -> pd.DataFrame:
