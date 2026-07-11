@@ -12,8 +12,10 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
 import streamlit as sl
+import os
 
-df = pd.read_csv("insurance_data.csv")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+df = pd.read_csv(os.path.join(BASE_DIR, "houseprice.csv"))
 
 sl.set_page_config(page_title="Insurance Prediction", page_icon="insurance.jpg", layout="wide")
 
