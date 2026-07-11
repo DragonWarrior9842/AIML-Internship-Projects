@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import joblib
 import os
+
 # -------------------------
 # Page Configuration
 # -------------------------
@@ -17,53 +18,78 @@ st.set_page_config(
 # -------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model = joblib.load(os.path.join(BASE_DIR, "cat_dog_model.pkl"))
-
 IMG_SIZE = 64
 
-st.title("🐱 Cat vs Dog Image Classifier")
-st.write("Upload an image to predict whether it is a Cat or Dog.")
-
 # -------------------------
-# Upload Image
+# Tabs: Classifier + About the Developer
 # -------------------------
-uploaded_file = st.file_uploader(
-    "Choose an Image",
-    type=["jpg", "jpeg", "png"]
-)
+tab_classifier, tab_about = st.tabs(["🐾 Classifier", "👤 About the Developer"])
 
-if uploaded_file is not None:
+with tab_classifier:
+    st.title("🐱 Cat vs Dog Image Classifier")
+    st.write("Upload an image to predict whether it is a Cat or Dog.")
 
-    # Read image using Pillow
-    image = Image.open(uploaded_file)
+    # -------------------------
+    # Upload Image
+    # -------------------------
+    uploaded_file = st.file_uploader(
+        "Choose an Image",
+        type=["jpg", "jpeg", "png"]
+    )
 
-    # Convert to RGB (important if image is grayscale/RGBA)
-    image = image.convert("RGB")
+    if uploaded_file is not None:
+        # Read image using Pillow
+        image = Image.open(uploaded_file)
 
-    # Display image
-    st.image(image, caption="Uploaded Image", width=300)
+        # Convert to RGB (important if image is grayscale/RGBA)
+        image = image.convert("RGB")
 
-    # Resize image
-    resized = image.resize((IMG_SIZE, IMG_SIZE))
+        # Display image
+        st.image(image, caption="Uploaded Image", width=300)
 
-    # Convert to NumPy array
-    resized = np.array(resized)
+        # Resize image
+        resized = image.resize((IMG_SIZE, IMG_SIZE))
 
-    # Flatten image for Logistic Regression
-    resized = resized.flatten()
+        # Convert to NumPy array
+        resized = np.array(resized)
 
-    # Prediction
-    prediction = model.predict([resized])[0]
+        # Flatten image for Logistic Regression
+        resized = resized.flatten()
 
-    probability = model.predict_proba([resized])[0]
+        # Prediction
+        prediction = model.predict([resized])[0]
+        probability = model.predict_proba([resized])[0]
 
-    # Display prediction
-    if prediction == 0:
-        st.success("🐱 Prediction: CAT")
-    else:
-        st.success("🐶 Prediction: DOG")
+        # Display prediction
+        if prediction == 0:
+            st.success("🐱 Prediction: CAT")
+        else:
+            st.success("🐶 Prediction: DOG")
 
-    # Display probabilities
-    st.subheader("Prediction Confidence")
+        # Display probabilities
+        st.subheader("Prediction Confidence")
+        st.write(f"🐱 Cat Probability: **{probability[0] * 100:.2f}%**")
+        st.write(f"🐶 Dog Probability: **{probability[1] * 100:.2f}%**")
 
-    st.write(f"🐱 Cat Probability: **{probability[0] * 100:.2f}%**")
-    st.write(f"🐶 Dog Probability: **{probability[1] * 100:.2f}%**")
+with tab_about:
+    st.header("About the Developer")
+    st.markdown("### Aditya Agarwal")
+    st.write("Data Science / ML Enthusiast")
+    st.write(
+        "Currently a student of Shri Ramswaroop Memorial College of "
+        "Engineering and Management, Lucknow, pursuing a Bachelor of "
+        "Technology in Computer Science Engineering."
+    )
+
+    st.markdown("---")
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("📧 [Email](mailto:aasblko@gmail.com)")
+        st.markdown("💼 [LinkedIn](https://www.linkedin.com/in/aditya-agarwal-48348126b/)")
+    with c2:
+        st.markdown("🐙 [GitHub](https://github.com/DragonWarrior9842)")
+        st.markdown("🌐 [Instagram](https://www.instagram.com/adityaagarwal67/)")
+
+    st.markdown("---")
+    st.caption("This classifier was built as part of a machine learning practice project.")
