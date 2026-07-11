@@ -80,6 +80,23 @@ section = st.sidebar.radio(
 )
 
 st.sidebar.markdown("---")
+
+with st.sidebar.expander("👤 About the Developer"):
+    st.markdown("**Aditya Agarwal**")
+    st.caption("Data Science / ML Enthusiast")
+    st.write(
+        "B.Tech CSE student at Shri Ramswaroop Memorial College of "
+        "Engineering and Management, Lucknow."
+    )
+    st.markdown(
+        "[📧 Email](mailto:aasblko@gmail.com) &nbsp;·&nbsp; "
+        "[💼 LinkedIn](https://www.linkedin.com/in/aditya-agarwal-48348126b/)"
+    )
+    st.markdown(
+        "[🐙 GitHub](https://github.com/DragonWarrior9842) &nbsp;·&nbsp; "
+        "[🌐 Instagram](https://www.instagram.com/adityaagarwal67/)"
+    )
+
 st.sidebar.caption("Built with Streamlit • NumPy • SciPy • statsmodels")
 
 
