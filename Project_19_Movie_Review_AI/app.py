@@ -33,12 +33,17 @@ def load_qa_pipeline():
 def load_summarization_pipeline():
     from transformers import pipeline
     return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
-@st.cache_resource(show_spinner=False)
-def load_metrics():
-    import evaluate
-    accuracy = evaluate.load("accuracy")
-    f1 = evaluate.load("f1")
-    return accuracy, f1
+def compute_accuracy_f1(references, predictions):
+    from sklearn.metrics import accuracy_score, f1_score
+    accuracy_result = accuracy_score(references, predictions)
+    f1_result = f1_score(references, predictions)
+    return accuracy_result, f1_result
+ 
+ 
+def compute_bleu(prediction, reference):
+    import sacrebleu
+    result = sacrebleu.sentence_bleu(prediction, [reference])
+    return result.score / 100
 @st.cache_data(show_spinner=False)
 def load_data(file) -> pd.DataFrame:
     df = pd.read_csv(file, sep=";", encoding="utf-8-sig")
@@ -102,9 +107,7 @@ with tabs[0]:
         st.dataframe(result_df, use_container_width=True)
         references = [1 if lbl == "POSITIVE" else 0 for lbl in real_labels]
         predictions = [1 if p["label"] == "POSITIVE" else 0 for p in predicted_labels]
-        accuracy, f1 = load_metrics()
-        accuracy_result = accuracy.compute(references=references, predictions=predictions)["accuracy"]
-        f1_result = f1.compute(references=references, predictions=predictions)["f1"]
+        accuracy_result, f1_result = compute_accuracy_f1(references, predictions)
         col1, col2 = st.columns(2)
         col1.metric("Accuracy", f"{accuracy_result:.2%}")
         col2.metric("F1 score", f"{f1_result:.3f}")
@@ -147,12 +150,8 @@ with tabs[1]:
         st.success("Translation complete")
         st.write(f"**Translated text:** {translated_review}")
         if reference_text.strip():
-            import evaluate
-            bleu = evaluate.load("bleu")
-            bleu_score = bleu.compute(
-                predictions=[translated_review], references=[[reference_text.strip()]]
-            )
-            st.metric("BLEU score", f"{bleu_score['bleu']:.4f}")
+            bleu_score = compute_bleu(translated_review, reference_text.strip())
+            st.metric("BLEU score", f"{bleu_score:.4f}")
         else:
             st.info("Add a reference translation above to compute a BLEU score.")
 with tabs[2]:
