@@ -132,7 +132,6 @@ st.markdown(
     .dev-footer a:hover {
         color: #4C7DF5;
     }
-    /* keep footer from covering the last bit of content */
     .block-container {
         padding-bottom: 4rem;
     }
