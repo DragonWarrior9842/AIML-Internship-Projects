@@ -3,11 +3,7 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 from tensorflow.keras.models import load_model
-# ---------------------------------------------------------
-# Config — must match what the model was trained on
-# ---------------------------------------------------------
 IMG_WIDTH, IMG_HEIGHT = 150, 150
-# Dynamically get the folder where app.py lives, then attach the model filename
 current_dir = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(current_dir, "binary_image_classifier.h5")
 st.set_page_config(
@@ -15,10 +11,6 @@ st.set_page_config(
     page_icon="🐾",
     layout="centered",
 )
-
-# ---------------------------------------------------------
-# 👨‍💻 ABOUT THE DEVELOPER — Native Streamlit Popover
-# ---------------------------------------------------------
 st.markdown(
     """
     <style>
@@ -92,7 +84,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
 with st.sidebar:
     with st.popover("🐾 About the Developer", use_container_width=True):
         st.markdown(
@@ -116,10 +107,6 @@ with st.sidebar:
             """,
             unsafe_allow_html=True,
         )
-
-# ---------------------------------------------------------
-# Model loading (cached so it only loads once per session)
-# ---------------------------------------------------------
 @st.cache_resource
 def get_model():
     if not os.path.isfile(MODEL_PATH):
@@ -129,19 +116,13 @@ def get_model():
         return model, None
     except Exception as e:
         return None, str(e)
-# ---------------------------------------------------------
-# Preprocessing (matches training: resize -> RGB -> /255)
-# ---------------------------------------------------------
 def preprocess_image(pil_img: Image.Image) -> np.ndarray:
-    pil_img = pil_img.convert("RGB")  # handles grayscale/PNG safely
+    pil_img = pil_img.convert("RGB")
     pil_img = pil_img.resize((IMG_WIDTH, IMG_HEIGHT))
     x = np.array(pil_img, dtype=np.float32)
     x = x / 255.0
-    x = np.expand_dims(x, axis=0)  # add batch dimension
+    x = np.expand_dims(x, axis=0)
     return x
-# ---------------------------------------------------------
-# UI
-# ---------------------------------------------------------
 st.title("🐱 Cat vs Dog Classifier 🐶")
 st.write("Upload an image of a cat or a dog to get a prediction.")
 model, load_error = get_model()
@@ -161,8 +142,6 @@ if uploaded_file is not None:
             x = preprocess_image(img)
             predictions = model.predict(x)
             pred = float(predictions[0][0])
-        # class_mode='binary' with flow_from_directory assigns classes
-        # alphabetically -> cats=0, dogs=1
         if pred >= 0.5:
             label = "Dog 🐶"
             confidence = pred
