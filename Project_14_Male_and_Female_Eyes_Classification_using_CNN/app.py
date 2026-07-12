@@ -3,26 +3,103 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 from tensorflow.keras.models import load_model
-
-# ---------------------------------------------------------
-# Config — must match what the model was trained on
-# ---------------------------------------------------------
 IMG_WIDTH, IMG_HEIGHT = 150, 150
-
-# Dynamically get the folder where app.py lives, then attach the model filename
 current_dir = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(current_dir, "eye_gender_classifier.h5")
-
 st.set_page_config(
     page_title="Male vs Female Eye Classifier",
     page_icon="👁️",
     layout="centered",
 )
+st.markdown(
+    """
+    <style>
+    #dev-tab-toggle {
+        display: none;
+    }
+    #dev-tab-label {
+        position: fixed;
+        top: 45%;
+        left: 0;
+        z-index: 9999;
+        background: #3a2e5c;
+        color: #f1e9ff;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        padding: 14px 6px;
+        border-radius: 0 8px 8px 0;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        cursor: pointer;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        user-select: none;
+    }
+    #dev-tab-panel {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 280px;
+        height: 100%;
+        background: #241a3d;
+        color: #f1e9ff;
+        z-index: 9998;
+        padding: 70px 22px 22px 22px;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+        transition: left 0.3s ease;
+    }
+    #dev-tab-toggle:checked ~ #dev-tab-panel {
+        left: 0;
+    }
+    #dev-tab-toggle:checked ~ #dev-tab-label {
+        left: 280px;
+        border-radius: 8px 0 0 8px;
+    }
+    #dev-tab-panel h4 {
+        margin: 0 0 4px 0;
+        font-size: 18px;
+        color: #ffffff;
+    }
+    #dev-tab-panel .role {
+        color: #b79cff;
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    #dev-tab-panel .edu {
+        font-size: 12px;
+        line-height: 1.6;
+        opacity: 0.8;
+        margin-bottom: 14px;
+    }
+    #dev-tab-panel a {
+        display: block;
+        color: #b79cff;
+        text-decoration: none;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+    #dev-tab-panel a:hover {
+        color: #ffffff;
+    }
+    </style>
 
-
-# ---------------------------------------------------------
-# Model loading (cached so it only loads once per session)
-# ---------------------------------------------------------
+    <input type="checkbox" id="dev-tab-toggle" />
+    <label id="dev-tab-label" for="dev-tab-toggle">ABOUT THE DEVELOPER</label>
+    <div id="dev-tab-panel">
+        <h4>Aditya Agarwal</h4>
+        <div class="role">Data Science / ML Enthusiast</div>
+        <div class="edu">
+            🎓 B.Tech, Computer Science Engineering<br/>
+            Shri Ramswaroop Memorial College of Engineering &amp; Management, Lucknow
+        </div>
+        <a href="mailto:aasblko@gmail.com">📧 Email</a>
+        <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">💼 LinkedIn</a>
+        <a href="https://github.com/DragonWarrior9842" target="_blank">🐙 GitHub</a>
+        <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">🌐 Instagram</a>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 @st.cache_resource
 def get_model():
     if not os.path.isfile(MODEL_PATH):
@@ -32,28 +109,16 @@ def get_model():
         return model, None
     except Exception as e:
         return None, str(e)
-
-
-# ---------------------------------------------------------
-# Preprocessing (matches training: resize -> RGB -> /255)
-# ---------------------------------------------------------
 def preprocess_image(pil_img: Image.Image) -> np.ndarray:
-    pil_img = pil_img.convert("RGB")  # handles grayscale/PNG safely
+    pil_img = pil_img.convert("RGB")
     pil_img = pil_img.resize((IMG_WIDTH, IMG_HEIGHT))
     x = np.array(pil_img, dtype=np.float32)
     x = x / 255.0
-    x = np.expand_dims(x, axis=0)  # add batch dimension
+    x = np.expand_dims(x, axis=0)
     return x
-
-
-# ---------------------------------------------------------
-# UI
-# ---------------------------------------------------------
 st.title("👁️ Male vs Female Eye Classifier")
 st.write("Upload a close-up image of an eye to get a prediction.")
-
 model, load_error = get_model()
-
 if load_error:
     st.error(
         "Could not load the model.\n\n"
@@ -61,43 +126,32 @@ if load_error:
         "Make sure `eye_gender_classifier.h5` is in the same folder as `app.py`."
     )
     st.stop()
-
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-
 if uploaded_file is not None:
     try:
         img = Image.open(uploaded_file)
         st.image(img, caption="Uploaded Image", use_column_width=True)
-
         with st.spinner("Classifying..."):
             x = preprocess_image(img)
             predictions = model.predict(x)
             pred = float(predictions[0][0])
-
-        # class_mode='binary' with flow_from_directory assigns classes
-        # alphabetically -> female=0, male=1 (double-check against the
-        # class_indices printed during training for your specific run)
         if pred >= 0.5:
             label = "Male 🧑"
             confidence = pred
         else:
             label = "Female 👩"
             confidence = 1 - pred
-
         st.success(f"Prediction: **{label}**")
         st.write(f"Confidence: **{confidence * 100:.2f}%**")
         st.progress(min(max(confidence, 0.0), 1.0))
-
         with st.expander("Raw model output"):
             st.write("predictions:", predictions.tolist())
             st.write("predictions.shape:", predictions.shape)
             st.caption("Score close to 0 → Female, score close to 1 → Male.")
-
     except Exception as e:
         st.error(f"Something went wrong while processing the image: {e}")
 else:
     st.info("👆 Upload a JPG or PNG image of an eye to get a prediction.")
-
 st.markdown("---")
 st.caption(
     "Model: CNN (3× Conv2D + MaxPooling, Dense(128) + Dropout, sigmoid output), "
