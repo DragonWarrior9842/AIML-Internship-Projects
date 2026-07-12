@@ -1,3 +1,4 @@
+import os
 import warnings
 warnings.filterwarnings("ignore")
 import numpy as np
@@ -57,15 +58,37 @@ def load_and_clean(file):
     return inp0, inp1, log
 st.sidebar.title("📱 Google Play Store")
 st.sidebar.markdown("Data Visualisation Case Study")
-uploaded = st.sidebar.file_uploader("Upload googleplaystore_v2.csv", type=["csv"])
-data_file = uploaded if uploaded is not None else "googleplaystore_v2.csv"
+CSV_NAME = "googleplaystore_v2.csv"
+def find_csv(filename):
+    candidate_dirs = [
+        os.path.dirname(os.path.abspath(__file__)),
+        os.getcwd(),
+    ]
+    for d in candidate_dirs:
+        candidate = os.path.join(d, filename)
+        if os.path.isfile(candidate):
+            return candidate
+    for d in candidate_dirs:
+        for root, _, files in os.walk(d):
+            if filename in files:
+                return os.path.join(root, filename)
+    return None
+uploaded = st.sidebar.file_uploader(f"Upload {CSV_NAME}", type=["csv"])
+if uploaded is not None:
+    data_file = uploaded
+else:
+    data_file = find_csv(CSV_NAME)
+if data_file is None:
+    st.error(
+        f"Could not find `{CSV_NAME}` next to the app (looked in "
+        f"`{os.path.dirname(os.path.abspath(__file__))}` and `{os.getcwd()}`). "
+        "Upload the file using the sidebar to continue."
+    )
+    st.stop()
 try:
     raw_df, df, cleaning_log = load_and_clean(data_file)
 except FileNotFoundError:
-    st.error(
-        "Could not find `googleplaystore_v2.csv` next to the app. "
-        "Upload the file using the sidebar to continue."
-    )
+    st.error(f"Could not read `{CSV_NAME}`. Upload the file using the sidebar to continue.")
     st.stop()
 st.sidebar.markdown("---")
 st.sidebar.subheader("Filters")
