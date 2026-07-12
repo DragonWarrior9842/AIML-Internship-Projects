@@ -1,5 +1,7 @@
 import io
 import re
+import os
+from pathlib import Path
 from collections import Counter
 import pandas as pd
 import streamlit as st
@@ -38,8 +40,8 @@ def compute_accuracy_f1(references, predictions):
     accuracy_result = accuracy_score(references, predictions)
     f1_result = f1_score(references, predictions)
     return accuracy_result, f1_result
- 
- 
+
+
 def compute_bleu(prediction, reference):
     import sacrebleu
     result = sacrebleu.sentence_bleu(prediction, [reference])
@@ -57,16 +59,21 @@ st.sidebar.header("1. Dataset")
 uploaded = st.sidebar.file_uploader(
     "Upload reviews CSV (Review;Class columns)", type=["csv"]
 )
-default_path = "netflix_movie_KGF_2.csv"
+APP_DIR = Path(__file__).resolve().parent
+default_path = APP_DIR / "netflix_movie_KGF_2.csv"
 if uploaded is not None:
     df = load_data(uploaded)
     st.sidebar.success(f"Loaded {len(df)} reviews from uploaded file.")
 else:
-    try:
+    if default_path.exists():
         df = load_data(default_path)
         st.sidebar.info(f"Using bundled dataset ({len(df)} reviews). Upload your own to replace it.")
-    except FileNotFoundError:
-        st.sidebar.warning("No dataset found. Please upload a CSV with 'Review' and 'Class' columns.")
+    else:
+        st.sidebar.warning(
+            f"Bundled dataset not found at:\n`{default_path}`\n\n"
+            f"Files in app folder: {[f.name for f in APP_DIR.iterdir()]}\n\n"
+            "Please upload a CSV with 'Review' and 'Class' columns."
+        )
         st.stop()
 reviews = df["Review"].astype(str).tolist()
 real_labels = df["Class"].astype(str).str.upper().tolist()
