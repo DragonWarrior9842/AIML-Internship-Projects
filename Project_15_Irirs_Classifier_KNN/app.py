@@ -3,21 +3,75 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
-
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.manifold import TSNE
-
 st.set_page_config(page_title="KNN — Iris Flower Classifier", page_icon="🌸", layout="wide")
-
 sns.set_style("whitegrid")
-
 SPECIES_NAMES = ["setosa", "versicolor", "virginica"]
 SPECIES_COLORS = {"setosa": "red", "versicolor": "purple", "virginica": "orange"}
-
-
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Serif+Display&display=swap');
+    #dev-badge {
+        position: fixed; bottom: 22px; right: 22px; z-index: 9999;
+        width: 56px; height: 56px; border-radius: 50%;
+        background: linear-gradient(135deg, #a855f7, #ec4899);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px; box-shadow: 0 4px 18px rgba(168,85,247,0.5);
+        cursor: pointer; transition: all 0.35s ease;
+    }
+    #dev-badge:hover {
+        width: 300px; height: auto; border-radius: 18px;
+        align-items: flex-start; flex-direction: column;
+        padding: 20px 22px; text-align: left;
+        background: linear-gradient(160deg, #3b0764, #831843);
+    }
+    #dev-badge .icon { transition: opacity 0.2s ease; }
+    #dev-badge:hover .icon { display: none; }
+    #dev-badge .card { display: none; width: 100%; }
+    #dev-badge:hover .card { display: block; }
+    #dev-badge .card h4 {
+        font-family: 'DM Serif Display', serif; color: #fdf4ff;
+        font-size: 20px; margin: 0 0 2px 0; font-style: italic;
+    }
+    #dev-badge .card .role {
+        font-family: 'Space Grotesk', sans-serif; color: #f0abfc;
+        font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    #dev-badge .card .edu {
+        font-family: 'Space Grotesk', sans-serif; color: #f5d0fe;
+        font-size: 12px; line-height: 1.6; opacity: 0.85; margin-bottom: 12px;
+    }
+    #dev-badge .card a {
+        font-family: 'Space Grotesk', sans-serif; display: block;
+        color: #ffffff; text-decoration: none; font-size: 13px;
+        font-weight: 500; margin-bottom: 6px; opacity: 0.9;
+    }
+    #dev-badge .card a:hover { opacity: 1; text-decoration: underline; }
+    </style>
+    <div id="dev-badge">
+        <span class="icon">👨‍💻</span>
+        <div class="card">
+            <h4>Aditya Agarwal</h4>
+            <div class="role">Data Science / ML Enthusiast</div>
+            <div class="edu">
+                🎓 B.Tech, Computer Science Engineering<br/>
+                Shri Ramswaroop Memorial College of Engineering &amp; Management, Lucknow
+            </div>
+            <a href="mailto:aasblko@gmail.com">📧 Email</a>
+            <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">💼 LinkedIn</a>
+            <a href="https://github.com/DragonWarrior9842" target="_blank">🐙 GitHub</a>
+            <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">🌐 Instagram</a>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 @st.cache_data
 def load_data():
     iris = datasets.load_iris()
@@ -30,25 +84,18 @@ def load_data():
     })
     df["species_name"] = df["species"].map(dict(enumerate(SPECIES_NAMES)))
     return iris, df
-
-
 @st.cache_data
 def compute_tsne(df, random_state=0):
     features_with_target = df[["sepal_length", "sepal_width", "petal_length", "petal_width", "species"]]
     tsne = TSNE(n_components=2, random_state=random_state)
     X_2d = tsne.fit_transform(features_with_target)
     return X_2d
-
-
 @st.cache_resource
 def train_knn(x_train, y_train, n_neighbors):
     knn = KNeighborsClassifier(n_neighbors=n_neighbors)
     knn.fit(x_train, y_train)
     return knn
-
-
 iris, df = load_data()
-
 st.sidebar.title("🌸 Iris KNN Classifier")
 st.sidebar.markdown("K-Nearest Neighbors on the classic Iris dataset")
 st.sidebar.markdown("---")
@@ -56,7 +103,6 @@ st.sidebar.subheader("Model settings")
 n_neighbors = st.sidebar.slider("Number of neighbors (k)", 1, 25, 7)
 test_size = st.sidebar.slider("Test set size", 0.1, 0.5, 0.30, 0.05)
 random_state = st.sidebar.number_input("Random state", value=1, step=1)
-
 x = df[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
 y = df["species"]
 x_train, x_test, y_train, y_test = train_test_split(
@@ -65,16 +111,13 @@ x_train, x_test, y_train, y_test = train_test_split(
 knn = train_knn(x_train, y_train, n_neighbors)
 pred = knn.predict(x_test)
 accuracy_knn = accuracy_score(y_test, pred) * 100
-
 st.sidebar.markdown("---")
 st.sidebar.metric("Current accuracy", f"{accuracy_knn:.2f}%")
-
 st.title("🌸 K-Nearest Neighbor Algorithm — Iris Flower Classification")
 st.markdown(
     "This app recreates the KNN case-study notebook: dataset exploration, "
     "visualisation, model training, and evaluation — fully interactive."
 )
-
 tab_overview, tab_eda, tab_corr, tab_tsne, tab_model, tab_predict = st.tabs(
     [
         "🏠 Overview",
@@ -85,8 +128,6 @@ tab_overview, tab_eda, tab_corr, tab_tsne, tab_model, tab_predict = st.tabs(
         "🔮 Try It Yourself",
     ]
 )
-
-# ==========================================================================
 with tab_overview:
     st.subheader("Load Iris flower dataset")
     c1, c2 = st.columns(2)
@@ -98,11 +139,9 @@ with tab_overview:
     with c2:
         st.markdown("**Raw data sample (first 5 rows)**")
         st.write(iris.data[0:5])
-
     st.subheader("Understanding the dataset")
     st.markdown("**DataFrame preview**")
     st.dataframe(df.head(), use_container_width=True)
-
     c3, c4 = st.columns(2)
     with c3:
         st.markdown("**Summary statistics**")
@@ -111,7 +150,6 @@ with tab_overview:
         st.markdown(f"**Shape:** {df.shape[0]} rows × {df.shape[1]} columns")
         st.markdown("**Null values per column**")
         st.dataframe(df.isnull().sum().rename("null_count"), use_container_width=True)
-
     st.markdown("**Column info**")
     info_df = pd.DataFrame({
         "column": df.columns,
@@ -119,11 +157,8 @@ with tab_overview:
         "non_null_count": df.notnull().sum().values,
     })
     st.dataframe(info_df, use_container_width=True)
-
     st.markdown("**Species value counts** — `setosa: 0, versicolor: 1, virginica: 2`")
     st.dataframe(df["species"].value_counts().rename("count"), use_container_width=True)
-
-# ==========================================================================
 with tab_eda:
     st.subheader("Feature distributions")
     hc1, hc2 = st.columns(2)
@@ -139,7 +174,6 @@ with tab_eda:
         ax.set_title("Petal Length distribution")
         ax.set_xlabel("petal_length")
         st.pyplot(fig)
-
     st.subheader("Explore any feature")
     feature_choice = st.selectbox(
         "Feature", ["sepal_length", "sepal_width", "petal_length", "petal_width"]
@@ -153,7 +187,6 @@ with tab_eda:
     ax.set_title(f"Distribution of {feature_choice} by species")
     ax.legend()
     st.pyplot(fig)
-
     st.subheader("Pairwise scatter — pick two features")
     sc1, sc2 = st.columns(2)
     with sc1:
@@ -168,18 +201,13 @@ with tab_eda:
     ax.set_ylabel(y_feat)
     ax.legend()
     st.pyplot(fig)
-
-# ==========================================================================
 with tab_corr:
     st.subheader("Correlation matrix")
     corr = df[["sepal_length", "sepal_width", "petal_length", "petal_width", "species"]].corr()
     st.dataframe(corr, use_container_width=True)
-
     fig, ax = plt.subplots(figsize=(5, 4))
     sns.heatmap(corr, annot=True, ax=ax, cmap="coolwarm")
     st.pyplot(fig)
-
-# ==========================================================================
 with tab_tsne:
     st.subheader("t-SNE — 2D projection")
     st.caption(
@@ -188,7 +216,6 @@ with tab_tsne:
     )
     tsne_seed = st.number_input("t-SNE random state", value=0, step=1, key="tsne_seed")
     X_2d = compute_tsne(df, random_state=tsne_seed)
-
     fig, ax = plt.subplots(figsize=(8, 6))
     scatter = ax.scatter(X_2d[:, 0], X_2d[:, 1], c=df["species"], cmap="viridis", alpha=0.8)
     handles, _ = scatter.legend_elements()
@@ -197,8 +224,6 @@ with tab_tsne:
     ax.set_ylabel("t-SNE dimension 2")
     ax.set_title("t-SNE projection of the Iris dataset")
     st.pyplot(fig)
-
-# ==========================================================================
 with tab_model:
     st.subheader("Train / test split")
     c1, c2 = st.columns(2)
@@ -208,10 +233,8 @@ with tab_model:
     with c2:
         st.markdown(f"**y_train shape:** {y_train.shape}")
         st.markdown(f"**y_test shape:** {y_test.shape}")
-
     st.subheader(f"K-Nearest Neighbors (k = {n_neighbors})")
     st.markdown(f"### Accuracy: **{accuracy_knn:.2f}%**")
-
     st.subheader("Confusion matrix")
     cm = confusion_matrix(y_test, pred)
     fig, ax = plt.subplots(figsize=(5, 4))
@@ -222,7 +245,6 @@ with tab_model:
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Actual")
     st.pyplot(fig)
-
     st.subheader("Accuracy vs. k")
     if st.checkbox("Show accuracy curve across different k values"):
         k_range = range(1, 26)
@@ -238,12 +260,9 @@ with tab_model:
         ax.set_ylabel("Accuracy (%)")
         ax.legend()
         st.pyplot(fig)
-
-# ==========================================================================
 with tab_predict:
     st.subheader("Predict a flower's species")
     st.markdown("Enter measurements below and the trained KNN model will predict the species.")
-
     p1, p2 = st.columns(2)
     with p1:
         sepal_length = st.slider("Sepal length (cm)", float(x["sepal_length"].min()), float(x["sepal_length"].max()), float(x["sepal_length"].mean()))
@@ -251,27 +270,21 @@ with tab_predict:
     with p2:
         petal_length = st.slider("Petal length (cm)", float(x["petal_length"].min()), float(x["petal_length"].max()), float(x["petal_length"].mean()))
         petal_width = st.slider("Petal width (cm)", float(x["petal_width"].min()), float(x["petal_width"].max()), float(x["petal_width"].mean()))
-
     input_df = pd.DataFrame([{
         "sepal_length": sepal_length,
         "sepal_width": sepal_width,
         "petal_length": petal_length,
         "petal_width": petal_width,
     }])
-
     prediction = knn.predict(input_df)[0]
     proba = knn.predict_proba(input_df)[0]
-
     st.markdown(f"### Predicted species: **{SPECIES_NAMES[prediction]}** 🌸")
-
     proba_df = pd.DataFrame({"species": SPECIES_NAMES, "probability": proba})
     fig, ax = plt.subplots(figsize=(6, 3.5))
     ax.bar(proba_df["species"], proba_df["probability"], color=[SPECIES_COLORS[s] for s in SPECIES_NAMES])
     ax.set_ylabel("Probability")
     ax.set_ylim(0, 1)
     st.pyplot(fig)
-
     st.caption(f"Prediction made using k = {n_neighbors} nearest neighbors.")
-
 st.markdown("---")
 st.caption("Built with Streamlit · Recreates the K-Nearest Neighbor Iris classification notebook.")
