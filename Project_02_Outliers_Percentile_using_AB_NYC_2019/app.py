@@ -95,7 +95,6 @@ with vcol1:
 with vcol2:
     fig_after_box = px.box(df2, x=column, title=f"Boxplot of {column} (cleaned)")
     st.plotly_chart(fig_after_box, use_container_width=True)
-st.subheader("Step 5 - Download the cleaned dataset")
 csv_bytes = df2.to_csv(index=False).encode("utf-8")
 st.download_button(
     label="Download cleaned CSV",
