@@ -1,5 +1,7 @@
 import io
 import re
+import os
+from pathlib import Path
 from collections import Counter
 import pandas as pd
 import streamlit as st
@@ -20,25 +22,31 @@ def load_sentiment_pipeline():
     return pipeline(
         "sentiment-analysis",
         model="distilbert-base-uncased-finetuned-sst-2-english",
+        device=-1,
     )
 @st.cache_resource(show_spinner="Loading translation model (EN→ES)...")
 def load_translation_pipeline():
     from transformers import pipeline
-    return pipeline("translation_en_to_es", model="Helsinki-NLP/opus-mt-en-es")
+    return pipeline("translation", model="Helsinki-NLP/opus-mt-en-es", device=-1)
 @st.cache_resource(show_spinner="Loading question-answering model...")
 def load_qa_pipeline():
     from transformers import pipeline
-    return pipeline("question-answering", model="deepset/minilm-uncased-squad2")
+    return pipeline("question-answering", model="deepset/minilm-uncased-squad2", device=-1)
 @st.cache_resource(show_spinner="Loading summarization model...")
 def load_summarization_pipeline():
     from transformers import pipeline
-    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
-@st.cache_resource(show_spinner=False)
-def load_metrics():
-    import evaluate
-    accuracy = evaluate.load("accuracy")
-    f1 = evaluate.load("f1")
-    return accuracy, f1
+    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=-1)
+def compute_accuracy_f1(references, predictions):
+    from sklearn.metrics import accuracy_score, f1_score
+    accuracy_result = accuracy_score(references, predictions)
+    f1_result = f1_score(references, predictions)
+    return accuracy_result, f1_result
+
+
+def compute_bleu(prediction, reference):
+    import sacrebleu
+    result = sacrebleu.sentence_bleu(prediction, [reference])
+    return result.score / 100
 @st.cache_data(show_spinner=False)
 def load_data(file) -> pd.DataFrame:
     df = pd.read_csv(file, sep=";", encoding="utf-8-sig")
@@ -52,21 +60,26 @@ st.sidebar.header("1. Dataset")
 uploaded = st.sidebar.file_uploader(
     "Upload reviews CSV (Review;Class columns)", type=["csv"]
 )
-default_path = "netflix_movie_KGF_2.csv"
+APP_DIR = Path(__file__).resolve().parent
+default_path = APP_DIR / "netflix movie Dhurandhar.csv"
 if uploaded is not None:
     df = load_data(uploaded)
     st.sidebar.success(f"Loaded {len(df)} reviews from uploaded file.")
 else:
-    try:
+    if default_path.exists():
         df = load_data(default_path)
         st.sidebar.info(f"Using bundled dataset ({len(df)} reviews). Upload your own to replace it.")
-    except FileNotFoundError:
-        st.sidebar.warning("No dataset found. Please upload a CSV with 'Review' and 'Class' columns.")
+    else:
+        st.sidebar.warning(
+            f"Bundled dataset not found at:\n`{default_path}`\n\n"
+            f"Files in app folder: {[f.name for f in APP_DIR.iterdir()]}\n\n"
+            "Please upload a CSV with 'Review' and 'Class' columns."
+        )
         st.stop()
 reviews = df["Review"].astype(str).tolist()
 real_labels = df["Class"].astype(str).str.upper().tolist()
 with st.expander("📄 Preview dataset", expanded=False):
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width="stretch")
 tabs = st.tabs(
     [
         "😊 Sentiment Analysis",
@@ -84,32 +97,36 @@ with tabs[0]:
         "against the ground-truth `Class` column."
     )
     if st.button("Run sentiment classification", key="run_sentiment"):
-        classifier = load_sentiment_pipeline()
-        with st.spinner("Classifying reviews..."):
-            predicted_labels = classifier(reviews, truncation=True)
-        result_rows = []
-        for review, pred, label in zip(reviews, predicted_labels, real_labels):
-            result_rows.append(
-                {
-                    "Review": review[:120] + ("..." if len(review) > 120 else ""),
-                    "Actual": label,
-                    "Predicted": pred["label"],
-                    "Confidence": round(pred["score"], 4),
-                    "Correct": "✅" if pred["label"] == label else "❌",
-                }
-            )
-        result_df = pd.DataFrame(result_rows)
-        st.dataframe(result_df, use_container_width=True)
-        references = [1 if lbl == "POSITIVE" else 0 for lbl in real_labels]
-        predictions = [1 if p["label"] == "POSITIVE" else 0 for p in predicted_labels]
-        accuracy, f1 = load_metrics()
-        accuracy_result = accuracy.compute(references=references, predictions=predictions)["accuracy"]
-        f1_result = f1.compute(references=references, predictions=predictions)["f1"]
-        col1, col2 = st.columns(2)
-        col1.metric("Accuracy", f"{accuracy_result:.2%}")
-        col2.metric("F1 score", f"{f1_result:.3f}")
-        st.session_state["predicted_labels"] = predicted_labels
-        st.session_state["predictions"] = predictions
+        try:
+            classifier = load_sentiment_pipeline()
+            with st.spinner("Classifying reviews..."):
+                predicted_labels = classifier(
+                    reviews, truncation=True, max_length=512, padding=True
+                )
+            result_rows = []
+            for review, pred, label in zip(reviews, predicted_labels, real_labels):
+                result_rows.append(
+                    {
+                        "Review": review[:120] + ("..." if len(review) > 120 else ""),
+                        "Actual": label,
+                        "Predicted": pred["label"],
+                        "Confidence": round(pred["score"], 4),
+                        "Correct": "✅" if pred["label"] == label else "❌",
+                    }
+                )
+            result_df = pd.DataFrame(result_rows)
+            st.dataframe(result_df, width="stretch")
+            references = [1 if lbl == "POSITIVE" else 0 for lbl in real_labels]
+            predictions = [1 if p["label"] == "POSITIVE" else 0 for p in predicted_labels]
+            accuracy_result, f1_result = compute_accuracy_f1(references, predictions)
+            col1, col2 = st.columns(2)
+            col1.metric("Accuracy", f"{accuracy_result:.2%}")
+            col2.metric("F1 score", f"{f1_result:.3f}")
+            st.session_state["predicted_labels"] = predicted_labels
+            st.session_state["predictions"] = predictions
+        except Exception as e:
+            st.error("Sentiment classification failed. Full error below:")
+            st.exception(e)
     st.divider()
     st.write("**Try your own review:**")
     custom_review = st.text_input(
@@ -147,12 +164,8 @@ with tabs[1]:
         st.success("Translation complete")
         st.write(f"**Translated text:** {translated_review}")
         if reference_text.strip():
-            import evaluate
-            bleu = evaluate.load("bleu")
-            bleu_score = bleu.compute(
-                predictions=[translated_review], references=[[reference_text.strip()]]
-            )
-            st.metric("BLEU score", f"{bleu_score['bleu']:.4f}")
+            bleu_score = compute_bleu(translated_review, reference_text.strip())
+            st.metric("BLEU score", f"{bleu_score:.4f}")
         else:
             st.info("Add a reference translation above to compute a BLEU score.")
 with tabs[2]:
