@@ -17,7 +17,39 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title(":briefcase: HR Employee Retention Predictor")
+# --------------------------------------------------------------------------
+# Developer credit - click-to-reveal inline card (no popup, no sidebar)
+# --------------------------------------------------------------------------
+if "show_dev_card" not in st.session_state:
+    st.session_state.show_dev_card = False
+
+title_col, toggle_col = st.columns([6, 1])
+with title_col:
+    st.title(":briefcase: HR Employee Retention Predictor")
+with toggle_col:
+    st.write("")
+    if st.button("ℹ️ About the developer"):
+        st.session_state.show_dev_card = not st.session_state.show_dev_card
+
+if st.session_state.show_dev_card:
+    with st.container(border=True):
+        d1, d2 = st.columns([1, 3])
+        with d1:
+            st.markdown("### 👨‍💻")
+        with d2:
+            st.markdown("**Aditya Agarwal**")
+            st.caption("Data Science / ML Enthusiast")
+            st.write(
+                "B.Tech CSE student at Shri Ramswaroop Memorial College of "
+                "Engineering and Management, Lucknow."
+            )
+            st.markdown(
+                "[📧 Email](mailto:aasblko@gmail.com) &nbsp;·&nbsp; "
+                "[💼 LinkedIn](https://www.linkedin.com/in/aditya-agarwal-48348126b/) &nbsp;·&nbsp; "
+                "[🐙 GitHub](https://github.com/DragonWarrior9842) &nbsp;·&nbsp; "
+                "[🌐 Instagram](https://www.instagram.com/adityaagarwal67/)"
+            )
+
 st.caption(
     "Exploratory analysis and a logistic regression model predicting "
     "whether an employee is likely to leave the company, based on the "

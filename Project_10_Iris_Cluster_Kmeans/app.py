@@ -10,6 +10,60 @@ from sklearn.preprocessing import MinMaxScaler
 st.set_page_config(page_title="K-Means: Iris Petal Clustering", layout="wide")
 
 st.title("🌸 K-Means Clustering — Iris Petal Length & Width")
+
+# ---------------------------------------------------------------
+# Developer credit - full-width gradient banner near the top
+# ---------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+    .dev-banner {
+        background: linear-gradient(90deg, #4C7DF5 0%, #8E5CF7 100%);
+        border-radius: 10px;
+        padding: 12px 20px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        color: white;
+    }
+    .dev-banner .dev-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    .dev-banner .dev-role {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+    .dev-banner a {
+        color: white;
+        text-decoration: none;
+        margin-left: 12px;
+        font-size: 0.85rem;
+        opacity: 0.95;
+    }
+    .dev-banner a:hover {
+        text-decoration: underline;
+    }
+    </style>
+
+    <div class="dev-banner">
+        <div>
+            <span class="dev-name">Aditya Agarwal</span> &nbsp;·&nbsp;
+            <span class="dev-role">Data Science / ML Enthusiast</span>
+        </div>
+        <div>
+            <a href="mailto:aasblko@gmail.com">Email</a>
+            <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">LinkedIn</a>
+            <a href="https://github.com/DragonWarrior9842" target="_blank">GitHub</a>
+            <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">Instagram</a>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.markdown(
     """
     This app reproduces the K-Means tutorial exercise:
