@@ -13,6 +13,18 @@ st.set_page_config(
     layout="wide",
 )
 sns.set_style("whitegrid")
+def clean_price(x):
+    if pd.isna(x):
+        return np.nan
+    s = str(x).strip()
+    if s == "":
+        return np.nan
+    if s.startswith("$"):
+        s = s[1:]
+    try:
+        return float(s)
+    except ValueError:
+        return np.nan
 @st.cache_data
 def load_and_clean(file):
     log = []
@@ -25,11 +37,28 @@ def load_and_clean(file):
     log.append(f"Dropped shifted/garbage row(s) -> {inp1.shape[0]} rows")
     inp1['Android Ver'] = inp1['Android Ver'].fillna(inp1['Android Ver'].mode()[0])
     inp1['Current Ver'] = inp1['Current Ver'].fillna(inp1['Current Ver'].mode()[0])
-    inp1['Price'] = inp1['Price'].apply(lambda x: 0 if x == "0" else float(str(x)[1:]))
+    inp1['Price'] = inp1['Price'].apply(clean_price)
+    before = inp1.shape[0]
+    inp1 = inp1[~inp1['Price'].isna()]
+    if before - inp1.shape[0]:
+        log.append(f"Dropped rows with unparseable Price -> removed {before - inp1.shape[0]} rows")
+    inp1['Reviews'] = pd.to_numeric(inp1['Reviews'], errors="coerce")
+    before = inp1.shape[0]
+    inp1 = inp1[~inp1['Reviews'].isna()]
+    if before - inp1.shape[0]:
+        log.append(f"Dropped rows with unparseable Reviews -> removed {before - inp1.shape[0]} rows")
     inp1['Reviews'] = inp1['Reviews'].astype("int64")
     def clean_installs(val):
-        return int(str(val).replace(",", "").replace("+", ""))
+        try:
+            return int(str(val).replace(",", "").replace("+", "").strip())
+        except ValueError:
+            return np.nan
     inp1['Installs'] = inp1['Installs'].apply(clean_installs)
+    before = inp1.shape[0]
+    inp1 = inp1[~inp1['Installs'].isna()]
+    if before - inp1.shape[0]:
+        log.append(f"Dropped rows with unparseable Installs -> removed {before - inp1.shape[0]} rows")
+    inp1['Installs'] = inp1['Installs'].astype("int64")
     before = inp1.shape[0]
     inp1 = inp1[inp1.Reviews <= inp1.Installs]
     log.append(f"Sanity check (Reviews <= Installs): removed {before - inp1.shape[0]} rows")
@@ -170,9 +199,8 @@ Steps performed on the raw dataset (mirrors the case-study notebook):
     b1, b2, b3 = st.columns(3)
     with b1:
         fig, ax = plt.subplots()
-        ax.boxplot(raw_df['Price'].apply(
-            lambda x: 0 if x == "0" else float(str(x)[1:])
-        ))
+        raw_price = raw_df['Price'].apply(clean_price).dropna()
+        ax.boxplot(raw_price)
         ax.set_title("Price (raw)")
         st.pyplot(fig)
     with b2:
