@@ -52,7 +52,6 @@ with col2:
     st.plotly_chart(fig_before, use_container_width=True)
 fig_box_before = px.box(df, x=column, title=f"Boxplot of {column} (raw)")
 st.plotly_chart(fig_box_before, use_container_width=True)
-st.subheader("Step 2 - Choose percentile thresholds")
 st.write(
     "The percentile method removes the most extreme low and high values "
     "by cutting off a small percentage from each tail of the distribution."
@@ -73,7 +72,6 @@ with st.expander(f"Rows below the min threshold ({column} < {min_threshold:,.2f}
     st.dataframe(df[df[column] < min_threshold], use_container_width=True)
 with st.expander(f"Rows above the max threshold ({column} > {max_threshold:,.2f})"):
     st.dataframe(df[df[column] > max_threshold], use_container_width=True)
-st.subheader("Step 3 - Remove the outliers")
 df2 = df[(df[column] > min_threshold) & (df[column] < max_threshold)]
 r1, r2, r3 = st.columns(3)
 r1.metric("Rows before", f"{df.shape[0]:,}")
@@ -88,7 +86,6 @@ compare = pd.concat(
     keys=["before", "after"],
 )
 st.dataframe(compare, use_container_width=True)
-st.subheader("Step 4 - Compare distributions")
 vcol1, vcol2 = st.columns(2)
 with vcol1:
     fig_after_hist = px.histogram(
