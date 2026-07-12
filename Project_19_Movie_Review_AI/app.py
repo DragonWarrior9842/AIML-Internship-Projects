@@ -5,10 +5,69 @@ from pathlib import Path
 from collections import Counter
 import pandas as pd
 import streamlit as st
-st.set_page_config(
-    page_title="Movie Review NLP Pipeline",
-    page_icon="🎬",
-    layout="wide",
+st.set_page_config(page_title="Movie Review NLP Pipeline", page_icon="🎬", layout="wide")
+st.markdown(
+    """
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap');
+    #dev-marquee-bar {
+        position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
+        background: #0a0a0a; border-top: 2px solid #d4af37; height: 42px;
+        display: flex; align-items: center; overflow: hidden;
+        box-shadow: 0 -4px 18px rgba(0,0,0,0.5);
+    }
+    #dev-marquee-bar .clap {
+        flex-shrink: 0; width: 46px; text-align: center; font-size: 20px;
+        border-right: 1px solid #3a3a3a; height: 100%;
+        display: flex; align-items: center; justify-content: center;
+    }
+    #dev-marquee-track {
+        display: flex; white-space: nowrap; animation: marquee-scroll 18s linear infinite;
+    }
+    #dev-marquee-bar:hover #dev-marquee-track { animation-play-state: paused; }
+    @keyframes marquee-scroll {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-50%); }
+    }
+    .marquee-item {
+        font-family: 'Bebas Neue', sans-serif; color: #d4af37; font-size: 16px;
+        letter-spacing: 2px; padding: 0 28px; display: flex; align-items: center; gap: 10px;
+    }
+    .marquee-item .role {
+        font-family: 'Courier Prime', monospace; color: #e5e5e5; font-size: 11px;
+        letter-spacing: 1px; text-transform: none;
+    }
+    .marquee-item a {
+        font-family: 'Courier Prime', monospace; color: #f5deb3; font-size: 11px;
+        text-decoration: none; border-bottom: 1px dotted #d4af37; margin-left: 8px;
+    }
+    .marquee-item a:hover { color: #ffffff; }
+    #app-body-spacer { height: 50px; }
+    </style>
+    <div id="dev-marquee-bar">
+        <div class="clap">🎬</div>
+        <div id="dev-marquee-track">
+            <div class="marquee-item">
+                DIRECTED &amp; DEVELOPED BY AI &nbsp;·&nbsp; ADITYA AGARWAL
+                <span class="role">Data Science / ML Enthusiast — B.Tech CSE, Shri Ramswaroop Memorial College of Engineering &amp; Management, Lucknow</span>
+                <a href="mailto:aasblko@gmail.com">EMAIL</a>
+                <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">LINKEDIN</a>
+                <a href="https://github.com/DragonWarrior9842" target="_blank">GITHUB</a>
+                <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">INSTAGRAM</a>
+            </div>
+            <div class="marquee-item">
+                DIRECTED &amp; DEVELOPED BY AI &nbsp;·&nbsp; ADITYA AGARWAL
+                <span class="role">Data Science / ML Enthusiast — B.Tech CSE, Shri Ramswaroop Memorial College of Engineering &amp; Management, Lucknow</span>
+                <a href="mailto:aasblko@gmail.com">EMAIL</a>
+                <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">LINKEDIN</a>
+                <a href="https://github.com/DragonWarrior9842" target="_blank">GITHUB</a>
+                <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">INSTAGRAM</a>
+            </div>
+        </div>
+    </div>
+    <div id="app-body-spacer"></div>
+    """,
+    unsafe_allow_html=True,
 )
 st.title("🎬 Movie Review NLP Pipeline")
 st.caption(
@@ -41,8 +100,6 @@ def compute_accuracy_f1(references, predictions):
     accuracy_result = accuracy_score(references, predictions)
     f1_result = f1_score(references, predictions)
     return accuracy_result, f1_result
-
-
 def compute_bleu(prediction, reference):
     import sacrebleu
     result = sacrebleu.sentence_bleu(prediction, [reference])
@@ -53,7 +110,6 @@ def load_data(file) -> pd.DataFrame:
     df.columns = [c.strip() for c in df.columns]
     return df
 def split_sentences(text: str):
-    """Very light sentence splitter (avoids extra NLTK downloads)."""
     sentences = re.split(r"(?<=[.!?])\s+", text.strip())
     return [s for s in sentences if s]
 st.sidebar.header("1. Dataset")
