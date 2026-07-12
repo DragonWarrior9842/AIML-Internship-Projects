@@ -22,19 +22,20 @@ def load_sentiment_pipeline():
     return pipeline(
         "sentiment-analysis",
         model="distilbert-base-uncased-finetuned-sst-2-english",
+        device=-1,
     )
 @st.cache_resource(show_spinner="Loading translation model (EN→ES)...")
 def load_translation_pipeline():
     from transformers import pipeline
-    return pipeline("translation_en_to_es", model="Helsinki-NLP/opus-mt-en-es")
+    return pipeline("translation", model="Helsinki-NLP/opus-mt-en-es", device=-1)
 @st.cache_resource(show_spinner="Loading question-answering model...")
 def load_qa_pipeline():
     from transformers import pipeline
-    return pipeline("question-answering", model="deepset/minilm-uncased-squad2")
+    return pipeline("question-answering", model="deepset/minilm-uncased-squad2", device=-1)
 @st.cache_resource(show_spinner="Loading summarization model...")
 def load_summarization_pipeline():
     from transformers import pipeline
-    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=-1)
 def compute_accuracy_f1(references, predictions):
     from sklearn.metrics import accuracy_score, f1_score
     accuracy_result = accuracy_score(references, predictions)
@@ -78,7 +79,7 @@ else:
 reviews = df["Review"].astype(str).tolist()
 real_labels = df["Class"].astype(str).str.upper().tolist()
 with st.expander("📄 Preview dataset", expanded=False):
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width="stretch")
 tabs = st.tabs(
     [
         "😊 Sentiment Analysis",
@@ -96,30 +97,36 @@ with tabs[0]:
         "against the ground-truth `Class` column."
     )
     if st.button("Run sentiment classification", key="run_sentiment"):
-        classifier = load_sentiment_pipeline()
-        with st.spinner("Classifying reviews..."):
-            predicted_labels = classifier(reviews, truncation=True)
-        result_rows = []
-        for review, pred, label in zip(reviews, predicted_labels, real_labels):
-            result_rows.append(
-                {
-                    "Review": review[:120] + ("..." if len(review) > 120 else ""),
-                    "Actual": label,
-                    "Predicted": pred["label"],
-                    "Confidence": round(pred["score"], 4),
-                    "Correct": "✅" if pred["label"] == label else "❌",
-                }
-            )
-        result_df = pd.DataFrame(result_rows)
-        st.dataframe(result_df, use_container_width=True)
-        references = [1 if lbl == "POSITIVE" else 0 for lbl in real_labels]
-        predictions = [1 if p["label"] == "POSITIVE" else 0 for p in predicted_labels]
-        accuracy_result, f1_result = compute_accuracy_f1(references, predictions)
-        col1, col2 = st.columns(2)
-        col1.metric("Accuracy", f"{accuracy_result:.2%}")
-        col2.metric("F1 score", f"{f1_result:.3f}")
-        st.session_state["predicted_labels"] = predicted_labels
-        st.session_state["predictions"] = predictions
+        try:
+            classifier = load_sentiment_pipeline()
+            with st.spinner("Classifying reviews..."):
+                predicted_labels = classifier(
+                    reviews, truncation=True, max_length=512, padding=True
+                )
+            result_rows = []
+            for review, pred, label in zip(reviews, predicted_labels, real_labels):
+                result_rows.append(
+                    {
+                        "Review": review[:120] + ("..." if len(review) > 120 else ""),
+                        "Actual": label,
+                        "Predicted": pred["label"],
+                        "Confidence": round(pred["score"], 4),
+                        "Correct": "✅" if pred["label"] == label else "❌",
+                    }
+                )
+            result_df = pd.DataFrame(result_rows)
+            st.dataframe(result_df, width="stretch")
+            references = [1 if lbl == "POSITIVE" else 0 for lbl in real_labels]
+            predictions = [1 if p["label"] == "POSITIVE" else 0 for p in predicted_labels]
+            accuracy_result, f1_result = compute_accuracy_f1(references, predictions)
+            col1, col2 = st.columns(2)
+            col1.metric("Accuracy", f"{accuracy_result:.2%}")
+            col2.metric("F1 score", f"{f1_result:.3f}")
+            st.session_state["predicted_labels"] = predicted_labels
+            st.session_state["predictions"] = predictions
+        except Exception as e:
+            st.error("Sentiment classification failed. Full error below:")
+            st.exception(e)
     st.divider()
     st.write("**Try your own review:**")
     custom_review = st.text_input(
