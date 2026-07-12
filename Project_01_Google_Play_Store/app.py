@@ -7,12 +7,68 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 import streamlit as st
-st.set_page_config(
-    page_title="Google Play Store Case Study",
-    page_icon="📱",
-    layout="wide",
-)
+st.set_page_config(page_title="Google Play Store Case Study", page_icon="📱", layout="wide")
 sns.set_style("whitegrid")
+if "show_dev_card" not in st.session_state:
+    st.session_state.show_dev_card = False
+def toggle_dev_card():
+    st.session_state.show_dev_card = not st.session_state.show_dev_card
+st.markdown(
+    """
+    <style>
+    #dev-popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 280px;
+        background: #1E1E1E;
+        color: #F5F5F5;
+        border: 1px solid #4C7DF5;
+        border-radius: 12px;
+        padding: 16px 18px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        z-index: 9999;
+        font-size: 14px;
+    }
+    #dev-popup h4 { margin: 0 0 4px 0; color: #4C7DF5; }
+    #dev-popup p { margin: 2px 0; }
+    #dev-popup a { color: #7FA8FF; text-decoration: none; }
+    #dev-popup a:hover { text-decoration: underline; }
+    .dev-toggle-btn button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10000;
+        border-radius: 50px !important;
+        background-color: #4C7DF5 !important;
+        color: white !important;
+        border: none !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+with st.container():
+    st.markdown('<div class="dev-toggle-btn">', unsafe_allow_html=True)
+    st.button("👤 Developer", on_click=toggle_dev_card)
+    st.markdown('</div>', unsafe_allow_html=True)
+if st.session_state.show_dev_card:
+    st.markdown(
+        """
+        <div id="dev-popup">
+            <h4>Aditya Agarwal</h4>
+            <p>Data Science / ML Enthusiast</p>
+            <p>B.Tech, Computer Science Engineering</p>
+            <p>Shri Ramswaroop Memorial College of Engineering and Management, Lucknow</p>
+            <hr style="border-color:#444;">
+            <p>📧 <a href="mailto:aasblko@gmail.com">Email</a></p>
+            <p>💼 <a href="https://www.linkedin.com/in/aditya-agarwal-48348126b/" target="_blank">LinkedIn</a></p>
+            <p>🐙 <a href="https://github.com/DragonWarrior9842" target="_blank">GitHub</a></p>
+            <p>🌐 <a href="https://www.instagram.com/adityaagarwal67/" target="_blank">Instagram</a></p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 def clean_price(x):
     if pd.isna(x):
         return np.nan
@@ -81,18 +137,14 @@ def load_and_clean(file):
     log.append(f"Dropped rare Content Rating categories: removed {before - inp1.shape[0]} rows")
     inp1.reset_index(inplace=True, drop=True)
     inp1['updated_month'] = pd.to_datetime(inp1['Last Updated'], errors="coerce").dt.month
-    inp1['Size_Bucket'] = pd.qcut(inp1['Size'], [0, 0.2, 0.4, 0.6, 0.8, 1],
-                                   labels=["VL", "L", "M", "H", "VH"])
+    inp1['Size_Bucket'] = pd.qcut(inp1['Size'], [0, 0.2, 0.4, 0.6, 0.8, 1], labels=["VL", "L", "M", "H", "VH"])
     log.append(f"Final cleaned dataset: {inp1.shape[0]} rows, {inp1.shape[1]} columns")
     return inp0, inp1, log
 st.sidebar.title("📱 Google Play Store")
 st.sidebar.markdown("Data Visualisation Case Study")
 CSV_NAME = "googleplaystore_v2.csv"
 def find_csv(filename):
-    candidate_dirs = [
-        os.path.dirname(os.path.abspath(__file__)),
-        os.getcwd(),
-    ]
+    candidate_dirs = [os.path.dirname(os.path.abspath(__file__)), os.getcwd()]
     for d in candidate_dirs:
         candidate = os.path.join(d, filename)
         if os.path.isfile(candidate):
@@ -103,10 +155,7 @@ def find_csv(filename):
                 return os.path.join(root, filename)
     return None
 uploaded = st.sidebar.file_uploader(f"Upload {CSV_NAME}", type=["csv"])
-if uploaded is not None:
-    data_file = uploaded
-else:
-    data_file = find_csv(CSV_NAME)
+data_file = uploaded if uploaded is not None else find_csv(CSV_NAME)
 if data_file is None:
     st.error(
         f"Could not find `{CSV_NAME}` next to the app (looked in "
@@ -149,16 +198,8 @@ col2.metric("Cleaned rows", f"{df.shape[0]:,}")
 col3.metric("Filtered rows", f"{len(filtered):,}")
 col4.metric("Avg. Rating (filtered)", f"{filtered['Rating'].mean():.2f}" if len(filtered) else "—")
 tab_overview, tab_cleaning, tab_dist, tab_cat, tab_scatter, tab_heat, tab_time, tab_data = st.tabs(
-    [
-        "🏠 Overview",
-        "🧹 Data Cleaning",
-        "📊 Distributions",
-        "🧩 Categorical Charts",
-        "🔵 Scatter / Pair Plots",
-        "🌡️ Heat Map",
-        "📈 Time & Stacked Charts",
-        "🗂️ Raw Data",
-    ]
+    ["🏠 Overview", "🧹 Data Cleaning", "📊 Distributions", "🧩 Categorical Charts",
+     "🔵 Scatter / Pair Plots", "🌡️ Heat Map", "📈 Time & Stacked Charts", "🗂️ Raw Data"]
 )
 with tab_overview:
     st.subheader("Problem Statement")
@@ -171,10 +212,7 @@ with tab_overview:
     st.subheader("Sample of the cleaned data")
     st.dataframe(filtered.head(10), use_container_width=True)
     st.subheader("Quick summary statistics")
-    st.dataframe(
-        filtered[['Rating', 'Reviews', 'Size', 'Installs', 'Price']].describe(),
-        use_container_width=True,
-    )
+    st.dataframe(filtered[['Rating', 'Reviews', 'Size', 'Installs', 'Price']].describe(), use_container_width=True)
 with tab_cleaning:
     st.subheader("Cleaning & Sanity-Check Pipeline")
     st.markdown(
@@ -256,9 +294,7 @@ with tab_cat:
         ax.set_title("Count of apps by Content Rating")
         st.pyplot(fig)
     st.subheader("Average / Median Rating by Content Rating (Seaborn barplot)")
-    estimator_choice = st.selectbox(
-        "Aggregation", ["Mean", "Median", "Min", "5th percentile"]
-    )
+    estimator_choice = st.selectbox("Aggregation", ["Mean", "Median", "Min", "5th percentile"])
     est_map = {
         "Mean": np.mean,
         "Median": np.median,
@@ -266,8 +302,7 @@ with tab_cat:
         "5th percentile": lambda x: np.quantile(x, 0.05),
     }
     fig, ax = plt.subplots(figsize=(9, 5))
-    sns.barplot(data=filtered, x="Content Rating", y="Rating",
-                estimator=est_map[estimator_choice], ax=ax)
+    sns.barplot(data=filtered, x="Content Rating", y="Rating", estimator=est_map[estimator_choice], ax=ax)
     plt.setp(ax.get_xticklabels(), rotation=30, ha="right")
     st.pyplot(fig)
     st.subheader("Boxplot — Rating across Content Rating")
@@ -316,9 +351,7 @@ with tab_scatter:
         st.pyplot(g.fig)
 with tab_heat:
     st.subheader("Pivot Table Heat Map — Rating by Content Rating & Size Bucket")
-    agg_choice = st.selectbox(
-        "Aggregation function", ["Mean", "Median", "Min", "Max", "20th percentile"]
-    )
+    agg_choice = st.selectbox("Aggregation function", ["Mean", "Median", "Min", "Max", "20th percentile"])
     agg_map = {
         "Mean": np.mean,
         "Median": np.median,
@@ -326,10 +359,7 @@ with tab_heat:
         "Max": np.max,
         "20th percentile": lambda x: np.quantile(x, 0.2),
     }
-    pivot = pd.pivot_table(
-        data=filtered, index="Content Rating", columns="Size_Bucket",
-        values="Rating", aggfunc=agg_map[agg_choice],
-    )
+    pivot = pd.pivot_table(data=filtered, index="Content Rating", columns="Size_Bucket", values="Rating", aggfunc=agg_map[agg_choice])
     fig, ax = plt.subplots(figsize=(8, 5))
     sns.heatmap(pivot, cmap="Greens", annot=True, fmt=".2f", ax=ax)
     st.pyplot(fig)
@@ -343,21 +373,12 @@ with tab_time:
     ax.set_ylabel("Average Rating")
     st.pyplot(fig)
     st.subheader("Interactive version (Plotly)")
-    fig_px = px.line(
-        monthly_rating, x="updated_month", y="Rating",
-        title="Monthly average rating", markers=True,
-    )
+    fig_px = px.line(monthly_rating, x="updated_month", y="Rating", title="Monthly average rating", markers=True)
     st.plotly_chart(fig_px, use_container_width=True)
     st.subheader("Stacked Bar Chart — Installs by Month & Content Rating")
-    monthly = pd.pivot_table(
-        data=filtered, values="Installs", index="updated_month",
-        columns="Content Rating", aggfunc="sum",
-    ).fillna(0)
+    monthly = pd.pivot_table(data=filtered, values="Installs", index="updated_month", columns="Content Rating", aggfunc="sum").fillna(0)
     view = st.radio("View", ["Absolute", "Proportion"], horizontal=True)
-    if view == "Proportion":
-        monthly_show = monthly.apply(lambda x: x / x.sum() if x.sum() else x, axis=1)
-    else:
-        monthly_show = monthly
+    monthly_show = monthly.apply(lambda x: x / x.sum() if x.sum() else x, axis=1) if view == "Proportion" else monthly
     fig, ax = plt.subplots(figsize=(10, 6))
     monthly_show.plot(kind="bar", stacked=True, ax=ax)
     ax.set_xlabel("Month")
