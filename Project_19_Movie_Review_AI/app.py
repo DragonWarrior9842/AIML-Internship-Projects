@@ -60,7 +60,7 @@ uploaded = st.sidebar.file_uploader(
     "Upload reviews CSV (Review;Class columns)", type=["csv"]
 )
 APP_DIR = Path(__file__).resolve().parent
-default_path = APP_DIR / "netflix_movie_KGF_2.csv"
+default_path = APP_DIR / "netflix movie Dhurandhar.csv"
 if uploaded is not None:
     df = load_data(uploaded)
     st.sidebar.success(f"Loaded {len(df)} reviews from uploaded file.")
